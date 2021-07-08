@@ -1,18 +1,23 @@
-/*
- * Project lab11
- * Description:
- * Author:
- * Date:
- */
+#include "Blynk.h"
+#include "LIS3DH.h"
+SYSTEM_THREAD(ENABLED);
+LIS3DHSPI accel(SPI, A4, WKP);
 
-// setup() runs once, when the device is first turned on.
 void setup() {
-  // Put initialization like pinMode and begin functions here.
-
+	Serial.begin(9600);
+  Blynk.begin("4Oy-pMhtDGrpu_zi1ocegBaiy6ty8yea", IPAddress(167, 172, 234, 162), 9090);
+	LIS3DHConfig config;
+	config.setAccelMode(LIS3DH::RATE_100_HZ);
+	bool setupSuccess = accel.setup(config);
 }
 
-// loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  // The core of your code will likely live here.
-
+  Blynk.run();
+	LIS3DHSample sample;
+	if (accel.getSample(sample)) {
+    Blynk.virtualWrite(V0, sample.x);
+    Blynk.virtualWrite(V1, sample.y);
+    Blynk.virtualWrite(V2, sample.z);
+	}
+  delay(100);
 }
